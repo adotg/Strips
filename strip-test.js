@@ -1,4 +1,4 @@
-var Strip = require("./strip");
+var Strip = require("./strips");
 
 var s = new Strip(process.stdout);
 var _log = s.nonupdatable;

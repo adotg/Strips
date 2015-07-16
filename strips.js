@@ -1,30 +1,30 @@
 /*
 * Strips
 * This is a util module that enables updatable or nonupdatable log in console.
-* 
-* @desc: 
+*
+* @desc:
 * By default logs are not updatable in console. That is,
 * for(var i = 0; i < 11; i++){console.log(i)} creates 10 different lines of log in console.
-* There is no way to show these all logs in the one line. Now what if the user wants to create 
-* an console application that shows processing speed, in that case the log has to be updated 
+* There is no way to show these all logs in the one line. Now what if the user wants to create
+* an console application that shows processing speed, in that case the log has to be updated
 * in one line.
 * In these scenario Strips comes for resque. From very high level, it divides the console into
-* many strips. The user defines whether its updatable or non-updatable. For the above mentioned 
+* many strips. The user defines whether its updatable or non-updatable. For the above mentioned
 * problem Strips provides updatable region where user can write his/her own progressive stuff.
-* 
-* There can be multiple Strips operating on application. Each Strips redirect output to one 
-* output stream. If you create two separate Strips with one single outstream then you will get 
+*
+* There can be multiple Strips operating on application. Each Strips redirect output to one
+* output stream. If you create two separate Strips with one single outstream then you will get
 * weird result.
-* 
+*
 * @api:
-* One Strips for one output stream :- 
+* One Strips for one output stream :-
 * var masterLog = new Strips(process.out);
 * var slaveLog = new Strips(slave.out);
-* 
+*
 * Describe updatable strip or non-updatable
 * var _mLog = masterLog.nonupdatable;
 * var __mLogupdatable = masterLog.updatable;
-* 
+*
 * Strat logging
 * _mLog("Non-updatable log");
 * __mLogupdatable("Updatable log");
@@ -41,7 +41,7 @@
 var util = require("util"),
 		stream = require("stream"),
 		controlSeq = Buffer([0x1b, 0x5b]);
-		
+
 /*
 * Strips
 * One Strips to work with one single output stream.
@@ -50,12 +50,12 @@ var util = require("util"),
 */
 function Strips(outputstream){
 	stream.Readable.call(this);
-	
+
 	this.pipe(outputstream);
 	this.positionHistory = {}
 	this.stripIndex = 0;
 	this.x = 1;
-	
+
 	Object.defineProperty(this.positionHistory, "totalCount", {
 		configurable : false,
 		enumerable : false,
@@ -82,7 +82,7 @@ Strips.prototype.commandControl = function(controlCode, params){
 		"MoveCursor" 			: { code : "H", def : function(){ return [1, 1]}},
 		"ClearStrip" 			: { code : "K", def : function(){ return 2}}
 		}, _mappedCode, _params;
-	
+
 	if(controlCode in codeMap){
 		_mappedCode = codeMap[controlCode];
 		_params = params || _mappedCode.def();
@@ -105,7 +105,7 @@ Strips.prototype.text = function(text){
 
 /*
 * Provides non updatable strips.
-* Asking for multiple nonupdatable strips does not make sense as after using one strip 
+* Asking for multiple nonupdatable strips does not make sense as after using one strip
 * thet next is initialized automatically
 */
 Object.defineProperty(Strips.prototype, "nonupdatable", {
@@ -127,13 +127,13 @@ Object.defineProperty(Strips.prototype, "nonupdatable", {
 * Provides updatable strips.
 * You can ask for as many updatable strips as you want.
 */
-Object.defineProperty(Strip.prototype, "updatable", {
+Object.defineProperty(Strips.prototype, "updatable", {
 	configurable : false,
 	enumerable : false,
 	get : function(){
 		var that = this,
 				uId = new UniqueObj();
-		return function(obj){			
+		return function(obj){
 			if(!(uId.id in that.positionHistory)){
 				that.positionHistory[uId.id] = {x : that.x++, y : 1};
 			}
@@ -165,4 +165,4 @@ Object.defineProperty(UniqueObj.prototype, "id", {
 });
 
 
-module.exports = Strip;
+module.exports = Strips;
