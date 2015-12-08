@@ -39,8 +39,8 @@
 */
 
 var util = require("util"),
-		stream = require("stream"),
-		controlSeq = Buffer([0x1b, 0x5b]);
+	stream = require("stream"),
+	controlSeq = Buffer([0x1b, 0x5b]);
 
 /*
 * Strips
@@ -79,8 +79,8 @@ Strips.prototype._read = function(){}
 */
 Strips.prototype.commandControl = function(controlCode, params){
 	var codeMap = {
-		"MoveCursor" 			: { code : "H", def : function(){ return [1, 1]}},
-		"ClearStrip" 			: { code : "K", def : function(){ return 2}}
+			"MoveCursor" 	: { code : "H", def : function(){ return [1, 1]}},
+			"ClearStrip" 	: { code : "K", def : function(){ return 2}}
 		}, _mappedCode, _params;
 
 	if(controlCode in codeMap){
@@ -115,7 +115,8 @@ Object.defineProperty(Strips.prototype, "nonupdatable", {
 		var that = this;
 		return function(obj){
 			var uId = new UniqueObj(),
-					_x = that.x++;
+				_x = that.x++;
+				
 			that.commandControl("MoveCursor", [_x, 1]);
 			that.commandControl("ClearStrip");
 			that.text(obj);
@@ -132,7 +133,8 @@ Object.defineProperty(Strips.prototype, "updatable", {
 	enumerable : false,
 	get : function(){
 		var that = this,
-				uId = new UniqueObj();
+			uId = new UniqueObj();
+
 		return function(obj){
 			if(!(uId.id in that.positionHistory)){
 				that.positionHistory[uId.id] = {x : that.x++, y : 1};
